@@ -1,5 +1,3 @@
-# vuite-boilerplate
-Vue 3 Boilerplate with Vite + TailwindCSS
 
 To run/edit:
 
