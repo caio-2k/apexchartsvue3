@@ -1,0 +1,12 @@
+/*! @import */
+/* Importando algumas coisas do Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
