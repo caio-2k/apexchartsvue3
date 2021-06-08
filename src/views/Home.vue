@@ -1,91 +1,117 @@
 <template>
-  <!-- ENTIRE SCREEN -->
-  <div class="home flex flex-col h-screen">
-    <!-- NAVBAR  -->
-    <nav class="flex justify-end p-10">
-      <router-link to="/tutorial">How do I update packages?</router-link>
-    </nav>
-    <!-- END NAVBAR  -->
-
-    <!-- BOX MAIN -->
-    <main class="flex flex-col justify-center items-center h-fulll">
-      <!-- CARD CONTAINER -->
-      <div
-      class="card-container">
-      <div
-        class="bg-white text-black font-bold rounded-lg shadow-lg p-10 animate__animated animate__fadeInDown animate_faster"
-      >
-      <apexchart
-          height="300"
-          type="area"
-          :options="options"
-          :series="series"
-        ></apexchart>
-      </div>
-      </div>
-      <!-- END CARD CONTAINER -->
-    </main>
-    <!-- END BOX MAIN -->
-  </div>
-  <!-- END ENTIRE SCREEN -->
+    <!-- ENTIRE SCREEN -->
+    <div class="home flex flex-col h-screen">
+        <!-- BOX MAIN -->
+        <main class="flex flex-col justify-center items-center h-full">
+            <!-- CARD CONTAINER -->
+            <div class="card-container">
+                <div
+                    class="
+                        bg-white
+                        text-black
+                        font-bold
+                        rounded-lg
+                        shadow-lg
+                        p-10
+                        animate__animated animate__fadeInDown animate_faster
+                    "
+                >
+                    <apexchart
+                        ref="chart1"
+                        height="800"
+                        width="900"
+                        type="bar"
+                        :options="options"
+                        :series="series"
+                    ></apexchart>
+                </div>
+                <hr />
+            </div>
+            <!-- END CARD CONTAINER -->
+        </main>
+        <!-- END BOX MAIN -->
+    </div>
+    <!-- END ENTIRE SCREEN -->
 </template>
 
 <script>
 export default {
-  name: 'Home',
+    name: 'Home',
 
-  data() {
-    return {
-      name: "App",
-      // Datos de la gráfica No: 1
-      options: {
-        chart: {
-          id: "vuechart-example",
-        },
-        xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
-        },
-      },
-      series: [
-        {
-          name: "series-1",
-          data: [30, 40, 45, 50, 49, 60, 70, 91],
-        },
-      ],
+    setup() {
+        return {
+            name: 'App',
+            // Datos de la gráfica No: 1
+            series: [
+                {
+                    data: [],
+                },
+            ],
 
-      // Datos de la gráfica No: 2
+            options: {
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        horizontal: true,
+                    },
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+                xaxis: {
+                    categories: [],
+                },
+                noData: {
+                    text: 'Carregando dados...',
+                },
+            },
+        }
+    },
+    mounted() {
+        this.getData()
+    },
 
-      optionsDos: {
-        chart: {
-          type: "donut",
+    methods: {
+        getData() {
+            this.axios
+                .get(
+                    'https://covid19-brazil-api.vercel.app/api/report/v1'
+                )
+                .then((res) => {
+                    this.$refs.chart1.updateSeries([
+                        {
+                            name: 'Sales',
+                            data: res.data.data,
+                        },
+                    ])
+                    const dados = res.data.data
+                    console.log(dados)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
         },
-        labels: ["Apple", "Mango", "Orange", "Watermelon"],
-      },
-
-      seriesDos: [44, 55, 13, 33],
-    };
-  }
+    },
 }
 </script>
 
 <style scoped lang="scss">
-
 nav {
-  > a {
-    font-size: 1em;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: #04d361;
-    text-transform: uppercase;
-    text-decoration: none;
-    -webkit-transition: color 0.15s ease;
-    -moz-transition: color 0.15s ease;
-    transition: color 0.15s ease;
-    &:hover {
-      color: #0ff577;
-      text-shadow: none;
-      border: none;
+    > a {
+        font-size: 1em;
+        font-weight: 300;
+        letter-spacing: 0.2em;
+        color: #04d361;
+        text-transform: uppercase;
+        text-decoration: none;
+        -webkit-transition: color 0.15s ease;
+        -moz-transition: color 0.15s ease;
+        transition: color 0.15s ease;
+        &:hover {
+            color: #0ff577;
+            text-shadow: none;
+            border: none;
+        }
     }
-  }
 }
 </style>
