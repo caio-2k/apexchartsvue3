@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="bg-black">
+  <div id="app">
     <router-view/>
   </div>
 </template>
@@ -11,11 +11,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app {
-  color: #fff;
-  background-image: url("./assets/images/bg.png");
-  background-size: cover;
-  background-attachment: fixed;
-  height: 100vh;
-}
 </style>

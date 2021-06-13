@@ -1,31 +1,31 @@
 <template>
     <!-- ENTIRE SCREEN -->
-    <div class="home flex flex-col h-screen">
+    <div class="home flex flex-col h-full">
         <!-- BOX MAIN -->
-        <main class="flex flex-col justify-center items-center h-full">
+        <main class="flex flex-col h-full justify-center items-center bg-white">
             <!-- CARD CONTAINER -->
             <div class="card-container">
                 <div
                     class="
-                        bg-white
-                        text-black
-                        font-bold
+                        bg-gray-50
                         rounded-lg
-                        shadow-lg
-                        p-10
-                        animate__animated animate__fadeInDown animate_faster
+                        shadow-xl
+                        px-10
+                        py-5
                     "
                 >
                     <apexchart
-                        ref="chart1"
-                        height="800"
-                        width="900"
+                        height="300"
+                        width="600"
                         type="bar"
-                        :options="options"
+                        :options="chartOptions"
                         :series="series"
                     ></apexchart>
+                    <div class="text-right">
+                    <h1 class="uppercase">API STATUS: {{ info }}</h1>
+                    <router-link class="font-bold underline" to="/allstate">Gráfico por estado?</router-link>
+                    </div>
                 </div>
-                <hr />
             </div>
             <!-- END CARD CONTAINER -->
         </main>
@@ -38,80 +38,137 @@
 export default {
     name: 'Home',
 
-    setup() {
+    data: function () {
         return {
+            info: null,
             name: 'App',
-            // Datos de la gráfica No: 1
+      
             series: [
                 {
+                    name: 'Casos',
+                    data: [],
+                },
+                {
+                    name: 'Suspeitos',
+                    data: [],
+                },
+                {
+                    name: 'Mortes',
                     data: [],
                 },
             ],
 
-            options: {
+            chartOptions: {
+                colors: ['#5C4742', '#A5978B', '#FF0000'],
+                chart: {
+                    // stacked: true,
+                },
+
                 plotOptions: {
                     bar: {
                         borderRadius: 4,
-                        horizontal: true,
+                        horizontal: false,
+                        columnWidth: 50,
                     },
                 },
+
                 dataLabels: {
-                    enabled: false,
+                    enabled: true,
+                    textAnchor: 'middle',
+                    distributed: false,
+                    offsetX: 0,
+                    offsetY: 0,
+                    style: {
+                        fontSize: '14px',
+                        fontFamily: 'Helvetica, Arial, sans-serif',
+                        fontWeight: 'bold',
+                        //will use same as defined previously
+                        colors: undefined,
+                    },
+                    background: {
+                        enabled: true,
+                        foreColor: '#fff',
+                        padding: 4,
+                        borderRadius: 2,
+                        borderWidth: 1,
+                        borderColor: '#fff',
+                        opacity: 0.9,
+                        dropShadow: {
+                            enabled: false,
+                            top: 1,
+                            left: 1,
+                            blur: 1,
+                            color: '#000',
+                            opacity: 0.45,
+                        },
+                    },
+                    dropShadow: {
+                        enabled: false,
+                        top: 1,
+                        left: 1,
+                        blur: 1,
+                        color: '#000',
+                        opacity: 0.45,
+                    },
+                },
+
+                title: {
+                    text: 'Status Covid',
+                    align: 'center',
                 },
                 xaxis: {
                     categories: [],
                 },
+
+                yaxis: {
+                    title: {
+                        text: undefined,
+                    },
+                },
                 noData: {
-                    text: 'Carregando dados...',
+                    text: 'Procurando dados...',
+                },
+
+                legend: {
+                    position: 'bottom',
+                    horizontalAlign: 'center',
+                    offsetX: 40,
+                    itemMargin: {
+                        horizontal: 10,
+                        vertical: 30,
+                    },
                 },
             },
         }
     },
-    mounted() {
+    mounted: function () {
         this.getData()
     },
 
     methods: {
-        getData() {
-            this.axios
+        getData: async function () {
+            await this.axios
                 .get(
-                    'https://covid19-brazil-api.vercel.app/api/report/v1'
+                    'https://covid19-brazil-api.vercel.app/api/report/v1/brazil/uf/rn'
                 )
-                .then((res) => {
-                    this.$refs.chart1.updateSeries([
-                        {
-                            name: 'Sales',
-                            data: res.data.data,
-                        },
-                    ])
-                    const dados = res.data.data
-                    console.log(dados)
+                .then((covid_response) => {
+                    const dados = (this.data = covid_response.data)
+
+                    this.chartOptions.xaxis.categories.push(
+                        covid_response.data.state
+                    )
+                    this.series[0].data.push(dados.cases)
+                    this.series[1].data.push(dados.suspects)
+                    this.series[2].data.push(dados.deaths)
                 })
-                .catch((err) => {
-                    console.log(err)
-                })
+            await this.axios
+                .get('https://covid19-brazil-api.vercel.app/api/status/v1')
+                .then((response) => (this.info = response.data.status))
         },
+        
     },
 }
 </script>
 
 <style scoped lang="scss">
-nav {
-    > a {
-        font-size: 1em;
-        font-weight: 300;
-        letter-spacing: 0.2em;
-        color: #04d361;
-        text-transform: uppercase;
-        text-decoration: none;
-        -webkit-transition: color 0.15s ease;
-        -moz-transition: color 0.15s ease;
-        transition: color 0.15s ease;
-        &:hover {
-            color: #0ff577;
-            text-shadow: none;
-            border: none;
-        }
-    }
-}
 </style>
